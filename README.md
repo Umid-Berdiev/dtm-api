@@ -10,9 +10,17 @@
 ## Installation
 
 `composer install`
+
 `cp .env.example .env`
+
 `php artisan key:generate`
+
 `php artisan migrate`
+
 `php artisan db:seed --class=CreateLanguages`
+
 `php artisan db:seed --class=DefaultSubjectsSeeder`
+
 `php artisan db:seed --class=RegionsSeeder`
+
+`php artisan db:seed --class=HeiSeeder`
