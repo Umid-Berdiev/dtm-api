@@ -30,6 +30,7 @@ class RegionController extends Controller
       "name_$locale as name",
       "admincenter_$locale as admincenter"
     ])
+      ->orderBy("name_$locale")
       ->get();
 
     return $this->success($list);

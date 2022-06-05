@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\EducationForm;
+use App\Models\EducationLanguage;
 use App\Models\HigherEducationalInstitution;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
@@ -70,6 +72,10 @@ class HigherEducationalInstitutionController extends Controller
       'region_soato' => $request->region_soato,
     ]);
 
+    if (count($request->edu_forms)) $data->education_forms()->attach($request->edu_forms);
+    if (count($request->edu_langs)) $data->education_languages()->attach($request->edu_langs);
+
+
     return $this->success($data);
   }
 
@@ -81,7 +87,7 @@ class HigherEducationalInstitutionController extends Controller
    */
   public function show(HigherEducationalInstitution $higherEducationalInstitution)
   {
-    return $this->success($higherEducationalInstitution);
+    return $this->success($higherEducationalInstitution->load(['education_forms', 'education_languages']));
   }
 
   /**
@@ -93,6 +99,7 @@ class HigherEducationalInstitutionController extends Controller
    */
   public function update(Request $request, HigherEducationalInstitution $higherEducationalInstitution)
   {
+    // return $request->all();
     $validator = Validator::make($request->all(), [
       'title_uz' => 'required',
       'title_ru' => 'required',
@@ -111,6 +118,11 @@ class HigherEducationalInstitutionController extends Controller
       'description_ru' => $request->description_ru,
       'region_soato' => $request->region_soato,
     ]);
+
+    $edu_forms = json_decode($request->edu_forms);
+    $edu_langs = json_decode($request->edu_langs);
+    $higherEducationalInstitution->education_forms()->sync($edu_forms);
+    $higherEducationalInstitution->education_languages()->sync($edu_langs);
 
     return $this->success($higherEducationalInstitution);
   }
@@ -172,5 +184,41 @@ class HigherEducationalInstitutionController extends Controller
     Excel::import(new HigherEducationalInstitution(), 'users.xlsx');
 
     return redirect('/')->with('success', 'All good!');
+  }
+
+  public function fetchEduForms(Request $request)
+  {
+    $locale = auth()->user()->locale;
+    $data = EducationForm::select(['id', "title_$locale as title"])->get();
+
+    return $this->success($data);
+  }
+
+  public function fetchEduLanguages(Request $request)
+  {
+    $locale = auth()->user()->locale;
+    $data = EducationLanguage::select(['id', "name_$locale as name"])->get();
+
+    return $this->success($data);
+  }
+
+  public function filterByYear(Request $request)
+  {
+    $locale = $request->user()->locale ?? 'uz';
+    $year = $request->year ?? date('Y') - 1;
+
+    $list = HigherEducationalInstitution::with([
+      // 'ratings'
+      'ratings' => fn ($query) => $query->where("year", $year)
+    ])
+      // ->whereHas('ratings', fn ($query) => $query->where("year", $year))
+      ->select([
+        "id",
+        "title_$locale as title",
+      ])
+      ->orderBy("title_$locale")
+      ->paginate($request->pageSize ?? 10);
+
+    return $this->success($list);
   }
 }

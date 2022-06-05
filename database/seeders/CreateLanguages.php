@@ -14,10 +14,19 @@ class CreateLanguages extends Seeder
    */
   public function run()
   {
-    // DB::table('languages')->truncate();
+    DB::table('languages')->truncate();
 
-    DB::table('languages')->insert(['name' => 'O\'zbekcha', 'code' => 'uz']);
-    DB::table('languages')->insert(['name' => 'Ruscha', 'code' => 'ru']);
-    DB::table('languages')->insert(['name' => 'Qoraqalpoqcha', 'code' => 'qq']);
+    DB::table('languages')->insert([
+      [
+        'name_uz' => 'O\'zbekcha',
+        'name_ru' => 'Узбекский',
+        'code' => 'uz'
+      ],
+      [
+        'name_uz' => 'Ruscha',
+        'name_ru' => 'Русский',
+        'code' => 'ru'
+      ]
+    ]);
   }
 }

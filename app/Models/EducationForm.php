@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Region extends Model
+class EducationForm extends Model
 {
   use HasFactory, SoftDeletes;
+
+  protected $guarded = [];
 }
