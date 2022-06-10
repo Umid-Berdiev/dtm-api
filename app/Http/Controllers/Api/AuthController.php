@@ -69,6 +69,7 @@ class AuthController extends Controller
 
     return response()->json([
       'email' => $request->email,
+      'locale' => auth()->user()->locale,
       'accessToken' => auth()->user()->createToken('API Token')->plainTextToken
     ]);
   }

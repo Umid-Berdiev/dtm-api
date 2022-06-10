@@ -33,7 +33,13 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 Route::post('confirm-password', [AuthController::class, 'confirmPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::get('regions', [RegionController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
+  Route::post('/locale', function (Request $request) {
+    $locale = $request->locale;
+    $request->user()->update(['locale' => $locale]);
+    return response()->json(['message' => 'success', 'locale' => $locale]);
+  });
   Route::get('higher_educational_institutions/all', [HigherEducationalInstitutionController::class, 'fetchAll']);
   Route::get('higher_educational_institutions/{higher_educational_institution}/directions', [HigherEducationalInstitutionController::class, 'fetchDirections']);
   Route::get('subjects/all', [SubjectController::class, 'fetchAll']);

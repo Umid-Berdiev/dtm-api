@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
    * @var array<int, string>
    */
   protected $except = [
-    // 'http://admin.inbrain.test/'
+    '/api/*'
   ];
 }

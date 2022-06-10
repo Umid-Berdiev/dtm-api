@@ -21,11 +21,11 @@ class HigherEducationalInstitutionController extends Controller
    */
   public function index(Request $request)
   {
-    $locale = $request->user()->locale ?? 'uz';
+    $locale = $request->user()->locale;
 
-    if ($request->has('locale'))
-      if ($request->locale == 'uz_latn') $locale = 'uz';
-      else $locale = $request->locale;
+    // if ($request->has('locale'))
+    //   if ($request->locale == 'uz_latn') $locale = 'uz';
+    //   else $locale = $request->locale;
 
     $list = HigherEducationalInstitution::with([
       'region' => fn ($query) => $query->select("soato", "name_$locale as name")
@@ -39,7 +39,7 @@ class HigherEducationalInstitutionController extends Controller
       ->when($request->has('search') && !empty($request->search), function ($query) use ($request, $locale) {
         $query->where("title_$locale", 'LIKE', '%' . $request->search . '%');
       })
-      ->latest('id')
+      ->orderBy("title_$locale")
       ->paginate($request->pageSize ?? 10);
 
     return $this->success($list);
@@ -87,7 +87,16 @@ class HigherEducationalInstitutionController extends Controller
    */
   public function show(HigherEducationalInstitution $higherEducationalInstitution)
   {
-    return $this->success($higherEducationalInstitution->load(['education_forms', 'education_languages']));
+    $locale = auth()->user()->locale ?? 'uz';
+    $data = $higherEducationalInstitution->load([
+      'education_forms',
+      'education_languages',
+      'directions',
+      'ratings'
+    ]);
+    $data["title"] = $data["title_$locale"];
+
+    return $this->success($data);
   }
 
   /**

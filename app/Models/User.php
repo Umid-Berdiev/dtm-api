@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use INBRAIN\OMP\Models\User as BaseUser;
 
 class User extends Authenticatable
 {

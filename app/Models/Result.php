@@ -11,9 +11,9 @@ class Result extends Model
   use HasFactory, SoftDeletes;
 
   protected $guarded = [];
-  protected $appends = [
-    'correct_variant',
-  ];
+  // protected $appends = [
+  //   'correct_variant',
+  // ];
 
   public function getCorrectVariantAttribute()
   {
