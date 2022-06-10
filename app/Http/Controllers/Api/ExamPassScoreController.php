@@ -32,7 +32,7 @@ class ExamPassScoreController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'hei_id' => 'required',
-      'year' => 'required|max:' . date('Y'),
+      'year' => 'required|integer|min:2010|max:' . date('Y'),
       'grant' => 'required',
       'contract' => 'required',
     ]);

@@ -82,13 +82,13 @@ class HigherEducationalInstitutionController extends Controller
   /**
    * Display the specified resource.
    *
-   * @param  \App\Models\HigherEducationalInstitution  $higherEducationalInstitution
+   * @param  \App\Models\HigherEducationalInstitution  $hei
    * @return \Illuminate\Http\Response
    */
-  public function show(HigherEducationalInstitution $higherEducationalInstitution)
+  public function show(HigherEducationalInstitution $hei)
   {
     $locale = auth()->user()->locale ?? 'uz';
-    $data = $higherEducationalInstitution->load([
+    $data = $hei->load([
       'education_forms',
       'education_languages',
       'directions',
@@ -103,10 +103,10 @@ class HigherEducationalInstitutionController extends Controller
    * Update the specified resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\HigherEducationalInstitution  $higherEducationalInstitution
+   * @param  \App\Models\HigherEducationalInstitution  $hei
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, HigherEducationalInstitution $higherEducationalInstitution)
+  public function update(Request $request, HigherEducationalInstitution $hei)
   {
     // return $request->all();
     $validator = Validator::make($request->all(), [
@@ -120,7 +120,7 @@ class HigherEducationalInstitutionController extends Controller
       return response()->json($validator->errors(), 422);
     }
 
-    $higherEducationalInstitution->update([
+    $hei->update([
       'title_uz' => $request->title_uz,
       'title_ru' => $request->title_ru,
       'description_uz' => $request->description_uz,
@@ -130,21 +130,21 @@ class HigherEducationalInstitutionController extends Controller
 
     $edu_forms = json_decode($request->edu_forms);
     $edu_langs = json_decode($request->edu_langs);
-    $higherEducationalInstitution->education_forms()->sync($edu_forms);
-    $higherEducationalInstitution->education_languages()->sync($edu_langs);
+    $hei->education_forms()->sync($edu_forms);
+    $hei->education_languages()->sync($edu_langs);
 
-    return $this->success($higherEducationalInstitution);
+    return $this->success($hei);
   }
 
   /**
    * Remove the specified resource from storage.
    *
-   * @param  \App\Models\HigherEducationalInstitution  $higherEducationalInstitution
+   * @param  \App\Models\HigherEducationalInstitution  $hei
    * @return \Illuminate\Http\Response
    */
-  public function destroy(HigherEducationalInstitution $higherEducationalInstitution)
+  public function destroy(HigherEducationalInstitution $hei)
   {
-    $higherEducationalInstitution->delete();
+    $hei->delete();
     return $this->success([], 'Success!');
   }
 
@@ -165,15 +165,15 @@ class HigherEducationalInstitutionController extends Controller
     return $this->success($list);
   }
 
-  public function fetchDirections(Request $request, HigherEducationalInstitution $higherEducationalInstitution)
+  public function fetchDirections(Request $request, HigherEducationalInstitution $hei)
   {
     $locale = $request->user()->locale ?? 'uz';
 
-    if ($request->has('locale'))
-      if ($request->locale == 'uz_latn') $locale = 'uz';
-      else $locale = $request->locale;
+    // if ($request->has('locale'))
+    //   if ($request->locale == 'uz_latn') $locale = 'uz';
+    //   else $locale = $request->locale;
 
-    $list = $higherEducationalInstitution->directions()
+    $list = $hei->directions()
       ->select([
         'id',
         'higher_educational_institution_id',

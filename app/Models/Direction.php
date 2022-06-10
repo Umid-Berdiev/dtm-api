@@ -8,22 +8,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Direction extends Model
 {
-    use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
-    protected $guarded = [];
+  protected $guarded = [];
 
-    public function higher_educational_institution()
-    {
-        return $this->belongsTo(HigherEducationalInstitution::class);
-    }
+  public function hei()
+  {
+    return $this->belongsTo(HigherEducationalInstitution::class);
+  }
 
-    public function first_subject()
-    {
-        return $this->hasOne(Subject::class, 'id', 'subject_1');
-    }
+  public function first_subject()
+  {
+    return $this->hasOne(Subject::class, 'id', 'subject_1');
+  }
 
-    public function second_subject()
-    {
-        return $this->hasOne(Subject::class, 'id', 'subject_2');
-    }
+  public function second_subject()
+  {
+    return $this->hasOne(Subject::class, 'id', 'subject_2');
+  }
 }

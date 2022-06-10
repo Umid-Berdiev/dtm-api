@@ -40,8 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     $request->user()->update(['locale' => $locale]);
     return response()->json(['message' => 'success', 'locale' => $locale]);
   });
-  Route::get('higher_educational_institutions/all', [HigherEducationalInstitutionController::class, 'fetchAll']);
-  Route::get('higher_educational_institutions/{higher_educational_institution}/directions', [HigherEducationalInstitutionController::class, 'fetchDirections']);
+  Route::get('heis/all', [HigherEducationalInstitutionController::class, 'fetchAll']);
+  Route::get('heis/filter', [HigherEducationalInstitutionController::class, 'filterByYear']);
+  Route::get('heis/{hei}/directions', [HigherEducationalInstitutionController::class, 'fetchDirections']);
   Route::get('subjects/all', [SubjectController::class, 'fetchAll']);
   Route::get('subjects/defaults', [SubjectController::class, 'fetchDefaults']);
   Route::get('questions/filtered', [SubjectController::class, 'fetchQuestionsBySelectedSubjects']);
@@ -50,12 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::get('exams/{exam}/results', [ExamController::class, 'fetchResultsByExamId']);
   Route::get('education_forms', [HigherEducationalInstitutionController::class, 'fetchEduForms']);
   Route::get('education_languages', [HigherEducationalInstitutionController::class, 'fetchEduLanguages']);
-  Route::get('otm/filter', [HigherEducationalInstitutionController::class, 'filterByYear']);
 
-  Route::apiResource('higher_educational_institutions', HigherEducationalInstitutionController::class);
+  Route::apiResource('heis', HigherEducationalInstitutionController::class);
   Route::apiResource('directions', DirectionController::class);
   Route::apiResource('subjects', SubjectController::class);
   Route::apiResource('questions', QuestionController::class);
   Route::apiResource('results', ResultController::class);
-  Route::apiResource('exam_pass_score', ExamPassScoreController::class);
+  Route::apiResource('exam_pass_scores', ExamPassScoreController::class);
 });
