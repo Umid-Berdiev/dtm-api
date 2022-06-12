@@ -188,6 +188,25 @@ class HigherEducationalInstitutionController extends Controller
     // return $this->error('Not Found!', 404);
   }
 
+  public function fetchExamPassScores(Request $request, HigherEducationalInstitution $hei)
+  {
+    $locale = $request->user()->locale ?? 'uz';
+
+    $list = $hei->exam_pass_scores()
+      ->with([
+        'direction' => fn ($query) => $query->select([
+          "id",
+          "title_$locale as title"
+        ])
+      ])
+      ->latest('year')
+      ->get();
+
+    return $this->success($list);
+
+    // return $this->error('Not Found!', 404);
+  }
+
   public function import()
   {
     Excel::import(new HigherEducationalInstitution(), 'users.xlsx');

@@ -34,7 +34,7 @@ class HigherEducationalInstitution extends Model
    */
   public function exam_pass_scores()
   {
-    return $this->hasMany(Examp::class, 'hei_id');
+    return $this->hasMany(ExamPassScore::class, 'hei_id');
   }
 
   /**

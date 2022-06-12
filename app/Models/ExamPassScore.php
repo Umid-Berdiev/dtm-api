@@ -21,4 +21,14 @@ class ExamPassScore extends Model
   {
     return $this->belongsTo(HigherEducationalInstitution::class);
   }
+
+  /**
+   * Get the direction that owns the ExamPassScore
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+   */
+  public function direction()
+  {
+    return $this->belongsTo(Direction::class);
+  }
 }

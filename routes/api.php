@@ -36,13 +36,14 @@ Route::get('regions', [RegionController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
   Route::post('/locale', function (Request $request) {
-    $locale = $request->locale;
+    $locale = $request->locale === 'uz_latn' ? 'uz' : $request->locale;
     $request->user()->update(['locale' => $locale]);
     return response()->json(['message' => 'success', 'locale' => $locale]);
   });
   Route::get('heis/all', [HigherEducationalInstitutionController::class, 'fetchAll']);
   Route::get('heis/filter', [HigherEducationalInstitutionController::class, 'filterByYear']);
   Route::get('heis/{hei}/directions', [HigherEducationalInstitutionController::class, 'fetchDirections']);
+  Route::get('heis/{hei}/exam_pass_scores', [HigherEducationalInstitutionController::class, 'fetchExamPassScores']);
   Route::get('subjects/all', [SubjectController::class, 'fetchAll']);
   Route::get('subjects/defaults', [SubjectController::class, 'fetchDefaults']);
   Route::get('questions/filtered', [SubjectController::class, 'fetchQuestionsBySelectedSubjects']);

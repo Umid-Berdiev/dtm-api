@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Exam;
 use App\Models\ExamPassScore;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
@@ -30,24 +31,30 @@ class ExamPassScoreController extends Controller
    */
   public function store(Request $request)
   {
+    $locale = $request->user()->locale ?? 'uz';
+
     $validator = Validator::make($request->all(), [
       'hei_id' => 'required',
       'year' => 'required|integer|min:2010|max:' . date('Y'),
-      'grant' => 'required',
-      'contract' => 'required',
+      'grant' => 'required|numeric|between:1,189',
+      'contract' => 'required|numeric|between:1,189',
     ]);
 
     if ($validator->fails()) {
       return response()->json($validator->errors(), 422);
     }
 
-    $data = ExamPassScore::create([
-      'hei_id' => $request->hei_id,
-      'year' => $request->year,
-      'grant' => $request->grant,
-      'contract' => $request->contract,
-      'direction_id' => $request->direction_id ?? null,
-    ]);
+    $data = ExamPassScore::updateOrCreate(
+      [
+        'hei_id' => $request->hei_id,
+        'year' => $request->year,
+        'direction_id' => $request->direction_id ?? null,
+      ],
+      [
+        'grant' => $request->grant,
+        'contract' => $request->contract,
+      ]
+    );
 
     $one_year_earlier_data = ExamPassScore::where([
       ['hei_id', $request->hei_id],
@@ -64,7 +71,32 @@ class ExamPassScoreController extends Controller
       $data->update(['status' => $status]);
     }
 
-    return $this->success($data);
+    $one_year_up_data = ExamPassScore::where([
+      ['hei_id', $request->hei_id],
+      ['direction_id', $request->direction_id],
+      ['year', $request->year + 1],
+    ])->first();
+
+    if ($one_year_up_data) {
+      $up_grant = $one_year_up_data->grant ?? 0;
+      $new_grant = $data->grant ?? 0;
+
+      $status = $up_grant > $new_grant ? 'up' : ($up_grant < $new_grant ? 'down' : 'stable');
+
+      $one_year_up_data->update(['status' => $status]);
+    }
+
+    $exam_pass_scores_list = ExamPassScore::with([
+      'direction' => fn ($query) => $query->select([
+        "id",
+        "title_$locale as title"
+      ])
+    ])
+      ->where('hei_id', $request->hei_id)
+      ->latest('year')
+      ->get();
+
+    return $this->success($exam_pass_scores_list);
   }
 
   /**
@@ -130,8 +162,22 @@ class ExamPassScoreController extends Controller
    * @param  \App\Models\ExamPassScore  $examPassScore
    * @return \Illuminate\Http\Response
    */
-  public function destroy(ExamPassScore $examPassScore)
+  public function destroy(Request $request, ExamPassScore $examPassScore)
   {
-    //
+    $locale = $request->user()->locale ?? 'uz';
+
+    $hei_id = $examPassScore->hei_id;
+    $examPassScore->delete();
+    $exam_pass_scores_list = ExamPassScore::with([
+      'direction' => fn ($query) => $query->select([
+        "id",
+        "title_$locale as title"
+      ])
+    ])
+      ->where('hei_id', $hei_id)
+      ->latest('year')
+      ->get();
+
+    return $this->success($exam_pass_scores_list);
   }
 }
