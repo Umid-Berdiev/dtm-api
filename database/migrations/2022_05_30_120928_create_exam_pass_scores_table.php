@@ -21,6 +21,7 @@ class CreateExamPassScoresTable extends Migration
       $table->unsignedDecimal('grant', 5, 2);
       $table->unsignedDecimal('contract', 5, 2);
       $table->enum('status', ['down', 'up', 'stable'])->default('stable');
+      $table->unsignedSmallInteger('quota')->nullable();
       $table->softDeletes();
       $table->timestamps();
     });

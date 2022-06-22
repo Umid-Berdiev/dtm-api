@@ -38,6 +38,7 @@ class ExamPassScoreController extends Controller
       'year' => 'required|integer|min:2010|max:' . date('Y'),
       'grant' => 'required|numeric|between:1,189',
       'contract' => 'required|numeric|between:1,189',
+      'quota' => 'integer|min:0',
     ]);
 
     if ($validator->fails()) {
@@ -53,6 +54,7 @@ class ExamPassScoreController extends Controller
       [
         'grant' => $request->grant,
         'contract' => $request->contract,
+        'quota' => $request->quota,
       ]
     );
 
@@ -122,8 +124,9 @@ class ExamPassScoreController extends Controller
     $validator = Validator::make($request->all(), [
       'hei_id' => 'required',
       'year' => 'required|max:' . date('Y'),
-      'grant' => 'required',
-      'contract' => 'required',
+      'grant' => 'required|numeric|min:0',
+      'contract' => 'required|numeric|min:0',
+      'quota' => 'integer|min:0',
     ]);
 
     if ($validator->fails()) {
@@ -136,6 +139,7 @@ class ExamPassScoreController extends Controller
       // 'direction_id' => $request->direction_id ?? null,
       'grant' => $request->grant,
       'contract' => $request->contract,
+      'quota' => $request->quota,
     ]);
 
     $one_year_earlier_data = ExamPassScore::where([

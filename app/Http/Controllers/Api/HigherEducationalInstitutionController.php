@@ -237,7 +237,7 @@ class HigherEducationalInstitutionController extends Controller
 
     $list = HigherEducationalInstitution::with([
       // 'ratings'
-      'ratings' => fn ($query) => $query->where("year", $year)
+      'exam_pass_scores' => fn ($query) => $query->where("year", $year)
     ])
       // ->whereHas('ratings', fn ($query) => $query->where("year", $year))
       ->select([
@@ -247,6 +247,53 @@ class HigherEducationalInstitutionController extends Controller
       ->orderBy("title_$locale")
       ->paginate($request->pageSize ?? 10);
 
+    return $this->success($list);
+  }
+
+  public function filter(Request $request)
+  {
+    $locale = $request->user()->locale ?? 'uz';
+    $year = (int) $request->year ?? date('Y') - 1;
+
+    $list = HigherEducationalInstitution::with([
+      'region',
+      'exam_pass_scores',
+      'education_forms' => fn ($query) => $request->edu_form_id && $query->whereId($request->edu_form_id),
+      'education_languages' => fn ($query) => $request->edu_lang_id && $query->whereId($request->edu_lang_id)
+    ])
+      ->select([
+        "id",
+        "title_$locale as title",
+      ])
+      ->when(
+        $request->has('region_soato') && !empty($request->region_soato),
+        function ($query) use ($request) {
+          $query->whereHas("region", fn ($query2) => $query2->where('soato', $request->region_soato));
+        }
+      )
+      ->when(
+        $request->has('edu_form') && !empty($request->edu_form),
+        function ($query) use ($request) {
+          $query->whereHas("education_forms", fn ($query2) => $query2->where('education_forms.id', $request->edu_form));
+        }
+      )
+      ->when(
+        $request->has('edu_lang') && !empty($request->edu_lang),
+        function ($query) use ($request) {
+          $query->whereHas("education_languages", fn ($query2) => $query2->where('education_languages.id', $request->edu_lang));
+        }
+      )
+      ->withCount('directions')
+      ->withSum([
+        'exam_pass_scores as total_quota' => fn ($query) => $query->where('year', $year)
+      ], 'quota')
+      ->whereHas(
+        "exam_pass_scores",
+        fn ($query) => $query->where('year', $year)
+      )
+      ->orderBy("title_$locale")
+      ->paginate($request->pageSize ?? 10);
+    // $list = 'success';
     return $this->success($list);
   }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\SubjectController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,7 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     return response()->json(['message' => 'success', 'locale' => $locale]);
   });
   Route::get('heis/all', [HigherEducationalInstitutionController::class, 'fetchAll']);
-  Route::get('heis/filter', [HigherEducationalInstitutionController::class, 'filterByYear']);
+  Route::get('heis/filter_by_year', [HigherEducationalInstitutionController::class, 'filterByYear']);
+  Route::get('heis/filter', [HigherEducationalInstitutionController::class, 'filter']);
   Route::get('heis/{hei}/directions', [HigherEducationalInstitutionController::class, 'fetchDirections']);
   Route::get('heis/{hei}/exam_pass_scores', [HigherEducationalInstitutionController::class, 'fetchExamPassScores']);
   Route::get('subjects/all', [SubjectController::class, 'fetchAll']);
@@ -60,3 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResource('results', ResultController::class);
   Route::apiResource('exam_pass_scores', ExamPassScoreController::class);
 });
+
+Route::middleware('auth.server')->get('/user', function (Request $request) {
+  $user = $request->user()->load('role', 'level');
+})->name('get.user');
